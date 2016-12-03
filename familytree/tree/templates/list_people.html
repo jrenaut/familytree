@@ -1,0 +1,4 @@
+{% load mongo %}
+{% for p in people %}
+<div><a href="{% url 'person_show' p|mongo_id %}">{{p.given_name}} {{p.surname}}</a></div>
+{% endfor %}

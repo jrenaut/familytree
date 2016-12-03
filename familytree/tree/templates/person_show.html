@@ -1,0 +1,28 @@
+{% load mongo %}
+{{person}}
+<dl>
+	<dt>Name</dt><dd>{{person.given_name}} {{person.surname}}</dd>
+	<dt>Birth</dt><dd>{% for b in person.birth %}<dd>{{b.date}} {{b.place}}</dd>{% endfor %}
+	{% if person.death %}
+		<dt>Death</dt><dd>{% for b in person.death %}<dd>{{b.date}} {{b.place}}</dd>{% endfor %}
+	{% endif %}
+	{% if person.marriage %}
+		<dt>Marriage</dt><dd>{% for b in person.marriage %}<dd>{{b.date}} {{b.place}}</dd>{% endfor %}
+	{% endif %}
+</dl>
+{% if person.parents %}
+<h3>Parents</h3>
+<ul>
+{% for p in person.parents %}
+<li><a href="{% url 'person_show' p.person %}">{{p.given_name}} {{p.surname}}</a>
+{% endfor %}
+</ul>
+{% endif %}
+{% if person.children %}
+<h3>Children</h3>
+<ul>
+{% for c in person.children %}
+<li><a href="{% url 'person_show' c.person %}">{{c.given_name}} {{c.surname}}</a>
+{% endfor %}
+</ul>
+{% endif %}
