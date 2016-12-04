@@ -1,5 +1,7 @@
+{% extends 'base.html' %}
 {% load mongo %}
-{{person}}
+{% block title %}{{person.given_name}} {{person.surname}}{% endblock %}
+{% block content %}
 <dl>
 	<dt>Name</dt><dd>{{person.given_name}} {{person.surname}}</dd>
 	<dt>Birth</dt><dd>{% for b in person.birth %}<dd>{{b.date}} {{b.place}}</dd>{% endfor %}
@@ -26,3 +28,8 @@
 {% endfor %}
 </ul>
 {% endif %}
+<h3>Raw</h3>
+<pre>
+{{pdict}}
+</pre>
+{% endblock %}

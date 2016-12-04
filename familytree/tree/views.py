@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.views.generic.edit import FormView
 from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
 from forms import JunkForm, UploadFileForm
 from familytree.mongo import get_mongo
 from .utils import save_individual
@@ -26,6 +27,7 @@ def yay(request):
     items = db.items.find()
     return render(request, 'yay.html', {"items":items})
 
+@login_required
 def upload_gedcom(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -34,7 +36,7 @@ def upload_gedcom(request):
             for x in request.FILES['file'].chunks():
                 z.extend([y for y in x.splitlines()])
             gc = Gedcom(z, chunks=True)
-            indiv = [save_individual(x, True) for x in gc.individual_list()]
+            indiv = [save_individual(x, request.user, True) for x in gc.individual_list()]
             return HttpResponseRedirect(reverse("list_people"))
     else:
         form = UploadFileForm()
@@ -43,10 +45,16 @@ def upload_gedcom(request):
 def show_gedcom(request):
     return HttpResponse("ok")
 
+@login_required
 def list_people(request):
     db = get_mongo("tree")
     return render(request, 'list_people.html', {"people":db.person.find()})
 
+@login_required
 def person_show(request, id):
     db = get_mongo("tree")
-    return render(request, 'person_show.html', {"person":db.person.find_one({"_id":ObjectId(id)})})
+    from pprint import PrettyPrinter
+    person = db.person.find_one({"_id":ObjectId(id)})
+    pp=PrettyPrinter(indent=3)
+    pdict = pp.pformat(person)
+    return render(request, 'person_show.html', {"person":person, "pdict":pdict})
